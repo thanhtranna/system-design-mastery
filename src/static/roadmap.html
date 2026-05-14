@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design Mastery — From Senior to Architect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --bg-card: #1a1a1a;
+  --ink: #f5f1e8;
+  --ink-dim: #8a8478;
+  --accent: #d4a574;
+  --accent-bright: #e8b886;
+  --line: #2a2620;
+  --line-bright: #3a342a;
+  --rust: #b85c2e;
+  --moss: #6b7f4a;
+  --slate: #4a6478;
+  --plum: #7a4a6b;
+  --gold: #b89545;
+  --paper: #f5f1e8;
+  --paper-warm: #ede7d6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter Tight', sans-serif;
+  font-feature-settings: "ss01", "ss02", "cv11";
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ===== GRAIN OVERLAY ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* ===== HEADER ===== */
+.masthead {
+  border-bottom: 1px solid var(--line);
+  padding: 1.2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  z-index: 50;
+}
+
+.brand {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+.brand span { color: var(--accent); }
+
+.masthead-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: 6rem 3rem 5rem;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -200px;
+  top: -100px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212,165,116,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+.hero h1 .strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--ink-dim);
+}
+
+.hero-lede {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  max-width: 720px;
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 3rem;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 900px;
+  gap: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-top: 0.5rem;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-section {
+  padding: 3rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-elev);
+}
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+.progress-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.progress-value {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+.progress-track {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== SECTION ===== */
+.section {
+  padding: 5rem 3rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+  gap: 3rem;
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.section-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.section-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-align: right;
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+/* ===== MODULE CARD ===== */
+.modules-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.module {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr 240px;
+  gap: 3rem;
+  padding: 3rem 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.module:last-child { border-bottom: 1px solid var(--line); }
+.module:hover {
+  background: linear-gradient(90deg, rgba(212,165,116,0.04), transparent);
+  padding-left: 1.5rem;
+}
+.module:hover .module-num {
+  color: var(--accent);
+  transform: translateX(-4px);
+}
+.module:hover .module-arrow {
+  transform: translateX(8px);
+  opacity: 1;
+}
+
+.module-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 3.5rem;
+  font-weight: 500;
+  color: var(--ink-dim);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  transition: all 0.3s;
+}
+
+.module-title-block h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.9rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 0.8rem;
+}
+.module-title-block h3 em { font-style: italic; color: var(--accent); }
+
+.module-phase {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  display: inline-block;
+}
+
+.module-desc {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  font-weight: 400;
+  max-width: 460px;
+}
+
+.module-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-content: flex-start;
+}
+.topic-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--line-bright);
+  border-radius: 20px;
+  color: var(--ink-dim);
+  background: var(--bg-card);
+}
+
+.module-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.module-duration {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.module-duration strong { color: var(--accent); font-weight: 500; }
+
+.module-arrow {
+  font-family: 'Fraunces', serif;
+  font-size: 2.5rem;
+  color: var(--accent);
+  opacity: 0.4;
+  transition: all 0.3s;
+  line-height: 1;
+}
+
+.module-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: flex-end;
+}
+.check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-bright);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.check:hover { border-color: var(--accent); }
+.check.done {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check.done::after {
+  content: '✓';
+  color: var(--bg);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ===== PHASE DIVIDER ===== */
+.phase-divider {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 3rem;
+  padding: 2rem 0;
+  align-items: center;
+  border-top: 2px solid var(--accent);
+  margin-top: 2rem;
+}
+.phase-divider:first-of-type { margin-top: 0; }
+.phase-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--accent);
+}
+.phase-label {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--ink);
+}
+.phase-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ===== MINDSET SECTION ===== */
+.mindset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.mindset-card {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.mindset-card:last-child { border-right: none; }
+
+.mindset-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+.mindset-from {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 0.5rem;
+}
+.mindset-shift {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+.mindset-shift .arrow { color: var(--accent); margin: 0 0.4rem; font-style: normal; }
+.mindset-shift .strike {
+  text-decoration: line-through;
+  color: var(--ink-dim);
+  text-decoration-thickness: 1.5px;
+}
+.mindset-body {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+/* ===== OUTCOMES ===== */
+.outcomes {
+  background: var(--bg-elev);
+  padding: 5rem 3rem;
+  border-bottom: 1px solid var(--line);
+}
+.outcome-list {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.outcome-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 3rem;
+  padding: 2rem 0;
+  border-bottom: 1px dashed var(--line);
+  align-items: baseline;
+}
+.outcome-item:last-child { border-bottom: none; }
+.outcome-num {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 2rem;
+  color: var(--accent);
+}
+.outcome-text {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  line-height: 1.4;
+  font-weight: 400;
+}
+.outcome-text em { color: var(--accent); font-style: italic; }
+
+/* ===== FOOTER ===== */
+.footer {
+  padding: 4rem 3rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.footer-quote {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+.footer-quote .accent { color: var(--accent); }
+
+@media (max-width: 900px) {
+  .hero { padding: 4rem 1.5rem 3rem; }
+  .section, .progress-section, .outcomes, .footer { padding: 3rem 1.5rem; }
+  .masthead { padding: 1rem 1.5rem; }
+  .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  .module {
+    grid-template-columns: 60px 1fr;
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+  .module-topics, .module-action { grid-column: 1 / -1; }
+  .module-action { flex-direction: row; justify-content: space-between; }
+  .mindset-grid { grid-template-columns: 1fr; }
+  .mindset-card { border-right: none; border-bottom: 1px solid var(--line); }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .phase-divider { grid-template-columns: 50px 1fr; }
+  .phase-tag { grid-column: 1 / -1; }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">SD<span>.</span>Mastery</div>
+  <div class="masthead-meta">A 6-Month Curriculum · v1.0</div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">A complete curriculum for the architect-in-waiting</div>
+  <h1 class="fade-in" style="animation-delay:0.1s">
+    System <em>Design</em><br>
+    Mastery —<br>
+    <span class="strike">just code</span> <em>think in systems.</em>
+  </h1>
+  <p class="hero-lede fade-in" style="animation-delay:0.3s">
+    From senior engineer to software architect. Eight modules covering distributed systems,
+    architecture patterns, quality attributes, and the communication craft that separates
+    engineers from architects.
+  </p>
+  <div class="hero-stats fade-in" style="animation-delay:0.5s">
+    <div>
+      <div class="stat-num">8</div>
+      <div class="stat-label">Modules</div>
+    </div>
+    <div>
+      <div class="stat-num">42</div>
+      <div class="stat-label">Topics</div>
+    </div>
+    <div>
+      <div class="stat-num">8</div>
+      <div class="stat-label">Capstones</div>
+    </div>
+    <div>
+      <div class="stat-num">~24</div>
+      <div class="stat-label">Weeks</div>
+    </div>
+  </div>
+</section>
+
+<section class="progress-section">
+  <div class="progress-header">
+    <div class="progress-label">Your Progress</div>
+    <div class="progress-value" id="progressValue">0 / 8</div>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">The <em>Curriculum.</em></h2>
+    <div class="section-meta">Eight modules<br>Three phases<br>~24 weeks</div>
+  </div>
+
+  <div class="modules-grid" id="modulesGrid">
+
+    <div class="phase-divider">
+      <div class="phase-num">I.</div>
+      <div class="phase-label">Foundations — <span style="color:var(--ink-dim);font-style:normal;font-size:1rem">think before you build</span></div>
+      <div class="phase-tag">Weeks 1–8</div>
+    </div>
+
+    <div class="module" data-id="01">
+      <div class="module-num">01</div>
+      <div class="module-title-block">
+        <div class="module-phase">Foundations · Week 1–3</div>
+        <h3>Thinking in <em>Systems</em></h3>
+        <p class="module-desc">
+          The architect's mental model. Quality attributes, constraints, trade-offs.
+          Why "it works" is not "it's done." How to read a system before changing it.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Quality Attributes</span>
+        <span class="topic-tag">CAP / PACELC</span>
+        <span class="topic-tag">Latency vs Throughput</span>
+        <span class="topic-tag">SLI / SLO / SLA</span>
+        <span class="topic-tag">Constraints</span>
+        <span class="topic-tag">Back-of-envelope</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>3 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="01"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" data-id="02">
+      <div class="module-num">02</div>
+      <div class="module-title-block">
+        <div class="module-phase">Foundations · Week 4–6</div>
+        <h3>Distributed <em>Systems Theory</em></h3>
+        <p class="module-desc">
+          The hard truths. Consistency models, consensus, time, failure detection.
+          Why everything you know about local programs is a lie at scale.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Consistency Models</span>
+        <span class="topic-tag">Raft / Paxos</span>
+        <span class="topic-tag">Lamport Clocks</span>
+        <span class="topic-tag">CRDTs</span>
+        <span class="topic-tag">Failure Modes</span>
+        <span class="topic-tag">FLP / 2 Generals</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>3 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="02"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" data-id="03">
+      <div class="module-num">03</div>
+      <div class="module-title-block">
+        <div class="module-phase">Foundations · Week 7–8</div>
+        <h3>Data <em>at Scale</em></h3>
+        <p class="module-desc">
+          Storage engines, indexing, partitioning, replication. SQL vs NoSQL trade-offs
+          informed by access patterns, not marketing. ACID, BASE, and everything between.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">LSM vs B-Tree</span>
+        <span class="topic-tag">Sharding</span>
+        <span class="topic-tag">Replication</span>
+        <span class="topic-tag">OLTP vs OLAP</span>
+        <span class="topic-tag">pgvector / Vector DBs</span>
+        <span class="topic-tag">CDC</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>2 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="03"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-divider">
+      <div class="phase-num">II.</div>
+      <div class="phase-label">Patterns — <span style="color:var(--ink-dim);font-style:normal;font-size:1rem">the language of design</span></div>
+      <div class="phase-tag">Weeks 9–16</div>
+    </div>
+
+    <div class="module" data-id="04">
+      <div class="module-num">04</div>
+      <div class="module-title-block">
+        <div class="module-phase">Patterns · Week 9–11</div>
+        <h3>Architecture <em>Styles</em></h3>
+        <p class="module-desc">
+          Monoliths, microservices, modular monoliths, serverless. The honest comparison
+          most people skip. When to split, when to consolidate, when each style is right.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Modular Monolith</span>
+        <span class="topic-tag">Microservices</span>
+        <span class="topic-tag">Hexagonal</span>
+        <span class="topic-tag">Clean / Onion</span>
+        <span class="topic-tag">Event-Driven</span>
+        <span class="topic-tag">Service Mesh</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>3 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="04"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" data-id="05">
+      <div class="module-num">05</div>
+      <div class="module-title-block">
+        <div class="module-phase">Patterns · Week 12–14</div>
+        <h3>Event-Driven & <em>CQRS</em></h3>
+        <p class="module-desc">
+          Decoupling through events. Outbox, sagas, idempotency, ordering. Why
+          eventual consistency is a feature, not a bug — and how to communicate that.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Event Sourcing</span>
+        <span class="topic-tag">CQRS</span>
+        <span class="topic-tag">Outbox Pattern</span>
+        <span class="topic-tag">Sagas</span>
+        <span class="topic-tag">Kafka Internals</span>
+        <span class="topic-tag">Idempotency</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>3 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="05"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" data-id="06">
+      <div class="module-num">06</div>
+      <div class="module-title-block">
+        <div class="module-phase">Patterns · Week 15–16</div>
+        <h3>Reliability <em>Patterns</em></h3>
+        <p class="module-desc">
+          Building systems that break gracefully. Circuit breakers, bulkheads, retries,
+          rate limiting, load shedding. Capacity planning without spreadsheets-of-doom.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Circuit Breaker</span>
+        <span class="topic-tag">Bulkhead</span>
+        <span class="topic-tag">Backpressure</span>
+        <span class="topic-tag">Retry / Hedging</span>
+        <span class="topic-tag">Rate Limiting</span>
+        <span class="topic-tag">Chaos Eng.</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>2 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="06"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-divider">
+      <div class="phase-num">III.</div>
+      <div class="phase-label">Craft — <span style="color:var(--ink-dim);font-style:normal;font-size:1rem">the architect's actual job</span></div>
+      <div class="phase-tag">Weeks 17–24</div>
+    </div>
+
+    <div class="module" data-id="07">
+      <div class="module-num">07</div>
+      <div class="module-title-block">
+        <div class="module-phase">Craft · Week 17–20</div>
+        <h3>Design at <em>Scale</em></h3>
+        <p class="module-desc">
+          The classic interview prompts done right. Chat, feeds, search, payments, ride-share.
+          Not memorizing answers — building the muscle to design anything in 45 minutes.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">Chat (WhatsApp)</span>
+        <span class="topic-tag">Feed (Twitter)</span>
+        <span class="topic-tag">Search (Google)</span>
+        <span class="topic-tag">Payments</span>
+        <span class="topic-tag">Ride-share</span>
+        <span class="topic-tag">URL Shortener</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>4 weeks</strong> · 1 capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="07"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" data-id="08">
+      <div class="module-num">08</div>
+      <div class="module-title-block">
+        <div class="module-phase">Craft · Week 21–24</div>
+        <h3>The Architect's <em>Craft</em></h3>
+        <p class="module-desc">
+          The non-technical 50%. ADRs, RFCs, technical leadership, influence without authority,
+          stakeholder communication. The skills you can't learn from a book on databases.
+        </p>
+      </div>
+      <div class="module-topics">
+        <span class="topic-tag">ADRs / RFCs</span>
+        <span class="topic-tag">C4 Diagrams</span>
+        <span class="topic-tag">Stakeholders</span>
+        <span class="topic-tag">Tech Strategy</span>
+        <span class="topic-tag">Influence</span>
+        <span class="topic-tag">Career Path</span>
+      </div>
+      <div class="module-action">
+        <div class="module-duration"><strong>4 weeks</strong> · Final capstone</div>
+        <div class="module-progress">
+          <div class="check" data-mod="08"></div>
+          <span class="module-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Three <em>mindset shifts.</em></h2>
+    <div class="section-meta">The senior → architect transition<br>is mostly mental</div>
+  </div>
+
+  <div class="mindset-grid">
+    <div class="mindset-card">
+      <div class="mindset-num">Shift 01</div>
+      <div class="mindset-from">From / To</div>
+      <h3 class="mindset-shift">
+        <span class="strike">Solve problems</span><br>
+        <span class="arrow">→</span> <em>Define constraints</em>
+      </h3>
+      <p class="mindset-body">
+        Seniors are paid to solve. Architects are paid to define the problem with such
+        clarity that the solution is obvious. The right question is harder than the right answer.
+      </p>
+    </div>
+
+    <div class="mindset-card">
+      <div class="mindset-num">Shift 02</div>
+      <div class="mindset-from">From / To</div>
+      <h3 class="mindset-shift">
+        <span class="strike">Functional first</span><br>
+        <span class="arrow">→</span> <em>Quality attributes first</em>
+      </h3>
+      <p class="mindset-body">
+        Features are table stakes. Architecture is the system's response to non-functional
+        forces: latency, availability, security, evolvability. These are what break in production.
+      </p>
+    </div>
+
+    <div class="mindset-card">
+      <div class="mindset-num">Shift 03</div>
+      <div class="mindset-from">From / To</div>
+      <h3 class="mindset-shift">
+        <span class="strike">Code is the artifact</span><br>
+        <span class="arrow">→</span> <em>Communication is</em>
+      </h3>
+      <p class="mindset-body">
+        ADRs, RFCs, diagrams, conversations. The architect's deliverable is alignment.
+        A great design that no one implements correctly is a failed design.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="outcomes">
+  <div class="section-header">
+    <h2 class="section-title">What you'll <em>walk away with.</em></h2>
+    <div class="section-meta">By week 24</div>
+  </div>
+  <div class="outcome-list">
+    <div class="outcome-item">
+      <div class="outcome-num">01.</div>
+      <div class="outcome-text">A portfolio of <em>8 production-grade designs</em> with full ADRs, C4 diagrams, and trade-off analysis.</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-num">02.</div>
+      <div class="outcome-text">A working capstone — a <em>distributed system you designed and built end-to-end</em>, deployable on AWS or k8s.</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-num">03.</div>
+      <div class="outcome-text">Fluency in the language architects speak: <em>quality attributes, CAP, consistency models, patterns</em> — not as buzzwords but as tools.</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-num">04.</div>
+      <div class="outcome-text">A repeatable framework for tackling <em>any system design problem</em> in 45 minutes or 6 months.</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-num">05.</div>
+      <div class="outcome-text">The non-technical craft: <em>writing ADRs that get read</em>, RFCs that get accepted, and presentations that move stakeholders.</div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-quote">
+    "An architect's job isn't to draw diagrams.<br>
+    It's to <span class="accent">make decisions reversible</span>,
+    or <span class="accent">make irreversible decisions correctly.</span>"
+  </div>
+  <div>SD.Mastery · 8 Modules · A complete curriculum</div>
+</footer>
+
+<script>
+// Progress tracking with localStorage fallback to in-memory
+const state = { completed: new Set() };
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('sd-progress');
+    if (saved) state.completed = new Set(JSON.parse(saved));
+  } catch (e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('sd-progress', JSON.stringify([...state.completed]));
+  } catch (e) {}
+}
+
+function updateProgress() {
+  const total = 8;
+  const done = state.completed.size;
+  const pct = (done / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressValue').textContent = done + ' / ' + total;
+}
+
+function renderChecks() {
+  document.querySelectorAll('.check').forEach(c => {
+    const mod = c.dataset.mod;
+    if (state.completed.has(mod)) c.classList.add('done');
+    else c.classList.remove('done');
+  });
+}
+
+document.querySelectorAll('.check').forEach(c => {
+  c.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const mod = c.dataset.mod;
+    if (state.completed.has(mod)) state.completed.delete(mod);
+    else state.completed.add(mod);
+    saveState();
+    renderChecks();
+    updateProgress();
+  });
+});
+
+document.querySelectorAll('.module').forEach(m => {
+  m.addEventListener('click', () => {
+    const id = m.dataset.id;
+    // In a real deploy, this would open the markdown module
+    console.log('Open module:', id);
+  });
+});
+
+loadState();
+renderChecks();
+updateProgress();
+</script>
+
+</body>
+</html>
