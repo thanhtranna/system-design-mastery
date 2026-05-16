@@ -1,3 +1,6 @@
 book/
 .DS_Store
 *.swp
+
+mermaid-init.js
+mermaid.min.js
