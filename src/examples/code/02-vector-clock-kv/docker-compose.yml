@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  node1:
+    build: .
+    environment:
+      NODE_ID: "node-1"
+      LISTEN_ADDR: ":8001"
+      PEERS: "node2:8002,node3:8003"
+    ports:
+      - "8001:8001"
+
+  node2:
+    build: .
+    environment:
+      NODE_ID: "node-2"
+      LISTEN_ADDR: ":8002"
+      PEERS: "node1:8001,node3:8003"
+    ports:
+      - "8002:8002"
+
+  node3:
+    build: .
+    environment:
+      NODE_ID: "node-3"
+      LISTEN_ADDR: ":8003"
+      PEERS: "node1:8001,node2:8002"
+    ports:
+      - "8003:8003"
